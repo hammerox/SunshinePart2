@@ -15,8 +15,11 @@
  */
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -140,7 +143,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
         // Get a reference to the ListView, and attach this adapter to it.
         mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
-
         TextView emptyView = (TextView) rootView.findViewById(R.id.listview_forecast_empty);
         mListView.setEmptyView(emptyView);
         mListView.setAdapter(mForecastAdapter);
@@ -262,6 +264,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             // to, do so now.
             mListView.smoothScrollToPosition(mPosition);
         }
+        updateEmptyView();
     }
 
     @Override
@@ -275,4 +278,18 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
         }
     }
+
+
+    public void updateEmptyView() {
+        if (mForecastAdapter.getCount() == 0) {
+            TextView emptyView = (TextView) getView().findViewById(R.id.listview_forecast_empty);
+            if (emptyView != null) {
+                if (!Utility.isNetworkAvailable(getActivity())) {
+                    emptyView.setText(R.string.empty_forecast_list_no_network);
+                }
+            }
+
+        }
+    }
+
 }
