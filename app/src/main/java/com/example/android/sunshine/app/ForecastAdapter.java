@@ -99,6 +99,10 @@ public class ForecastAdapter extends CursorAdapter {
         String description = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
         // Find TextView and set weather forecast on it
         viewHolder.descriptionView.setText(description);
+        viewHolder.descriptionView.setContentDescription(context.getString(
+				R.string.a11y_forecast,
+				description
+		));
 
         // For accessibility, add a content description to the icon field
         viewHolder.iconView.setContentDescription(description);
@@ -109,10 +113,18 @@ public class ForecastAdapter extends CursorAdapter {
         // Read high temperature from cursor
         double high = cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
         viewHolder.highTempView.setText(Utility.formatTemperature(context, high));
+		viewHolder.highTempView.setContentDescription(context.getString(
+				R.string.a11y_high_temp,
+				high
+		));
 
         // Read low temperature from cursor
         double low = cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP);
         viewHolder.lowTempView.setText(Utility.formatTemperature(context, low));
+		viewHolder.lowTempView.setContentDescription(context.getString(
+				R.string.a11y_low_temp,
+				low
+		));
     }
 
     public void setUseTodayLayout(boolean useTodayLayout) {
