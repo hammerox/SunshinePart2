@@ -272,4 +272,14 @@ public class Utility {
                 context.getResources().getString(R.string.pref_location_status_key),
                 SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
     }
+
+
+    public static void resetLocationStatus(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(
+                context.getResources().getString(R.string.pref_location_status_key),
+                SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
+        editor.apply();
+    }
 }

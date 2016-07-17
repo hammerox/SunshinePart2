@@ -51,7 +51,11 @@ import java.util.Vector;
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID,  LOCATION_STATUS_UNKNOWN})
+    @IntDef({LOCATION_STATUS_OK,
+            LOCATION_STATUS_SERVER_DOWN,
+            LOCATION_STATUS_SERVER_INVALID,
+            LOCATION_STATUS_UNKNOWN,
+            LOCATION_STATUS_INVALID})
     public @interface LocationStatus {}
 
     public static final int LOCATION_STATUS_OK = 0;
@@ -60,6 +64,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             LOCATION_STATUS_SERVER_INVALID = 2;
     public static final int
             LOCATION_STATUS_UNKNOWN = 3;
+    public static final int
+            LOCATION_STATUS_INVALID = 4;
 
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
     // Interval at which to sync with the weather, in seconds.
@@ -195,6 +201,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         // into an Object hierarchy for us.
 
         // These are the names of the JSON objects that need to be extracted.
+        final String OWM_MESSAGE_CODE = "cod";
 
         // Location information
         final String OWM_CITY = "city";
@@ -224,6 +231,23 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
         try {
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
+
+            Log.d("json", forecastJson.toString());
+
+            if (forecastJson.has(OWM_MESSAGE_CODE)) {
+                int messageCode = forecastJson.getInt(OWM_MESSAGE_CODE);
+                switch (messageCode) {
+                    case HttpURLConnection.HTTP_OK:
+                        break;
+                    case HttpURLConnection.HTTP_NOT_FOUND:
+                        setLocationStatus(getContext(), LOCATION_STATUS_INVALID);
+                        break;
+                    default:
+                        setLocationStatus(getContext(), LOCATION_STATUS_SERVER_DOWN);
+                        break;
+                }
+            }
+
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
             JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
